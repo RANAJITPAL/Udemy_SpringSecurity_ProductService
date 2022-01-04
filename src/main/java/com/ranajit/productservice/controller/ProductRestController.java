@@ -14,7 +14,7 @@ import org.springframework.web.client.RestTemplate;
 
 @RestController
 @RequestMapping("/productapi")
-public class ProductController {
+public class ProductRestController {
 
     @Autowired
     private ProductRepository productRepository;
