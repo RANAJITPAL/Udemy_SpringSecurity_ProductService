@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -23,9 +24,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception{
-        httpSecurity.httpBasic();
-        httpSecurity.authorizeRequests().mvcMatchers(HttpMethod.GET,"/productapi/products/{id:^[0-9]*$}").hasAnyRole("USER","ADMIN")
-                .mvcMatchers(HttpMethod.POST,"/productapi/products").hasRole("ADMIN")
+//        httpSecurity.httpBasic();
+        httpSecurity.authorizeRequests().mvcMatchers(HttpMethod.GET,"/productapi/products/{id:^[0-9]*$}",
+                        "/showGetProduct","/productDetails").hasAnyRole("USER","ADMIN")
+                .mvcMatchers(HttpMethod.POST,"/productapi/products","/saveProduct").hasAnyRole("ADMIN")
+                .mvcMatchers(HttpMethod.GET,"/showCreateProduct","/createProduct","/createResponse").hasAnyRole("ADMIN")
+                .mvcMatchers("/","/login").permitAll()
+                .mvcMatchers("/getProduct").hasAnyRole("ADMIN","USER")
                 .anyRequest().denyAll()
                 .and().csrf().disable();
     }
@@ -33,5 +38,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
+    }
+
+    @Override
+    @Bean
+    public AuthenticationManager authenticationManagerBean() throws Exception{
+        return super.authenticationManagerBean();
     }
 }
